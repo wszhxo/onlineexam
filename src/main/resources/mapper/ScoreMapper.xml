@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zhx.onlineexam.mapper.ScoreMapper">
+
+
+
+
+
+    <!--显示所有学生或者老师-->
+    <select id="listScore" resultType="cn.zhx.onlineexam.entity.Score" >
+        SELECT u.`name`,s.score,s.userid,
+        timediff(s.endtime,s.begintime) lasttime
+        FROM`student-exam` AS s LEFT JOIN
+        `user` AS u on s.userid=u.id
+        <where>
+            <if test="examid!=null">
+                and s.examid=#{examid}
+            </if>
+            <if test="classid!=0">
+                and u.classid =#{classid}
+            </if>
+        </where>
+        ORDER BY s.score,timediff(s.endtime,s.begintime)
+    </select>
+
+</mapper>

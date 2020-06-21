@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>用户管理</title>
+    <script th:src="@{/layui/layui.js}"></script>
+    <script th:src="@{/js/jquery.js}"></script>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+    <style type="text/css">
+        html,body{
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+
+</head>
+<body>
+<span class="layui-breadcrumb">
+  <a href="/">首页</a>
+  <a href="/demo/">演示</a>
+  <a><cite>导航元素</cite></a>
+</span>
+<div class="layui-fluid">
+
+
+
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">姓名</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="name" id="name" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="search">
+                        <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-card-body">
+            <div style="padding-bottom: 10px;">
+                <a  style="margin-left: 70px"  class="layui-btn layui-btn-normal" onclick="add();">添加老师</a>
+            </div>
+            <table class="layui-hide" id="test" lay-filter="test"></table>
+
+            <script type="text/html" id="barDemo">
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="editPSW">重置密码</a>
+            </script>
+        </div>
+    </div>
+</div>
+
+
+<script  th:inline="none">
+    function add(){//添加学生
+
+        layer.open({
+            type: 2,
+            title: '添加老师',
+            skin: 'layui-layer-demo', //加上边框
+            area: ['800px', '350px'], //宽高
+            content: '/toaddTeacherPage'
+        });
+    }
+    layui.use(['form', 'table'],function () {
+        var table = layui.table;
+        var form = layui.form;
+        var $ = layui.$;
+
+        table.render({
+            elem: '#test'
+            , url: '/users?type=11'
+            , title: '用户表'
+            , cols: [[
+                {field: 'id', title: '工号', width: 100}
+                , {field: 'name', title: '姓名', width: 200,edit:true}
+                , {field: 'email', title: '邮箱', width: 200,edit:true}
+                , {field: 'phone', title: '电话', width: 200,edit:true}
+                , {field: 'sex', title: '性别', width: 200,edit:true}
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo'}
+            ]]
+            ,id: 'testReload'
+            ,page: true
+        });
+
+        //监听搜索
+        form.on('submit(search)', function(data){
+            var field = data.field;
+            var name = $('#name');
+            //执行重载
+            table.reload('testReload', {
+                method: 'get'
+                ,page: {
+                    curr: 1 //重新从第 1 页开始
+                },
+                where: {
+                    name: name.val(),
+                }
+            });
+        });
+
+
+        //监听单元格编辑 dataTable 对应 <table> 中的 lay-filter="dataTable"
+        table.on('edit(test)', function(obj){
+            var value = obj.value, //得到修改后的值
+                data = obj.data, //得到所在行所有键值
+                field = obj.field; //得到字段
+
+            var data1 = {};
+           console.log(value);
+
+            if(field=="sex"){
+                if (value!="男"||value!="女")
+                    layer.msg("修改失败!请输入男或者女!");
+                return false;
+            }else if (field=="phone") {//上述下拉框的变量
+                if((value.match(/^1[3|4|5|6|7|8|9]\d{9}$/))==null){
+                    layer.msg("手机号码有误，请重填!");
+                    return false;
+                }
+            }else if (field=="email") {//上述下拉框的变量
+                if((value.match(/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/))==null){
+                    layer.msg("邮箱格式有误，请重填!");
+                    return false;
+                }
+            }
+            data1[field] = value;
+
+            data1["id"] = data.id;
+
+            layer.confirm('您确定要修改吗？', function (index) {
+                $.post('/editUser', data1, function (result) {
+                    if (result.code>0) {
+                        layer.msg('修改成功');
+                        window.location.reload();//刷新父页面
+                    }
+                }, 'json');
+            });
+        });
+
+        //监听删除
+        table.on('tool(test)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'del') {
+                layer.confirm('您确定要删除该用户信息吗？', function (index) {
+                    $.ajax({
+                        url:'/users/'+data.id,
+                        type:"DELETE",
+                        dataType:"json",
+                        success:function(result){
+                            if (result.code > 0) {
+                                layer.msg("删除成功!")
+                                window.location.reload();//刷新父页面
+                            }else{
+                                layer.msg("系统异常!重新删除!")
+                            }
+                        }
+                    });
+                });
+            }else if (obj.event === 'editPSW') {
+
+                $.post('/editPSW/'+data.id,function (result) {
+                    if (result.code ==1){
+                        layer.msg(result.msg);
+                    }
+                },'json');
+
+            }
+        });
+    });
+</script>
+</body>
+</html>

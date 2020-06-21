@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>试题管理</title>
+    <script th:src="@{/layui/layui.js}"></script>
+    <script th:src="@{/js/jquery.js}"></script>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+    <style type="text/css">
+        html,body{
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="layui-col-md12">
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <fieldset class="layui-elem-field layui-field-title">
+            <legend>以下列出了所有试卷</legend>
+        </fieldset></div>
+        <div class="layui-card-body">
+        <table class="layui-hide" id="test" lay-filter="test"></table>
+        <script type="text/html" id="barDemo">
+            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="look">查看榜单</a>
+        </script>
+    </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+<script  th:inline="none">
+    function add(){//添加题目
+        window.location.href="/toaddExamPage";
+    }
+    layui.use(['form', 'table'],function () {
+        var table = layui.table;
+        var form = layui.form;
+        var $ = layui.$;
+        // 获取难度的下拉框
+        $.ajax({
+            url:  "/difficults",
+            dataType: 'json',
+            type: 'get',
+            success: function (data) {
+                $.each(data.data, function (index, item) {
+                    $("select[name=difficultid]").append('<option value="'+item.id+'">'+item.name+'</option>');
+                });
+                layui.form.render("select");
+            }
+        });
+        //获取题目种类的下拉框
+        $.ajax({
+            url:  "/classs",
+            dataType: 'json',
+            type: 'get',
+            success: function (data) {
+                $.each(data.data, function (index, item) {
+                    $("select[name=classid]").append('<option value="'+item.id+'">'+item.name+'</option>');
+                });
+                layui.form.render("select");
+            }
+        });
+        //获取课程的下拉框
+        $.ajax({
+            url:  "/courses",
+            dataType: 'json',
+            type: 'get',
+            success: function (data) {
+                $.each(data.data, function (index, item) {
+                    $("select[name=courseid]").append('<option value="'+item.id+'">'+item.name+'</option>');
+                });
+                layui.form.render("select");
+            }
+        });
+        table.render({
+            elem: '#test'
+            , url: '/exams'
+            , title: '试题表'
+            , cols: [[
+                {field: 'id', title: '序号', width: 80}
+                , {field: 'name', title: '试卷名', width: 150}
+                , {field: 'begintime', title: '开始时间', width: 150}
+                , {field: 'endtime', title: '结束时间', width: 150}
+                , {field: 'lasttime', title: '考试时间', width: 150}
+                , {field: 'total', title: '总分', width: 100}
+                , {field: 'difficultid', title: '难度', width: 100,templet: function(d){
+                        return d.difficult.name;
+                    }}
+                , {field: 'teacherid', title: '出题老师', width: 100,templet: function(d){
+                        return d.user.name;
+                    }}
+                , {field: 'courseid', title: '所属课程', width: 150,templet: function(d){
+                        return d.course.name;
+                    }}
+                , {field: 'classidsname', title: '考试班级', width: 150}
+                , {fixed: 'right', title: '操作', width: 100 ,toolbar: '#barDemo'}
+            ]]
+            ,id: 'testReload'
+            ,page: true
+        });
+
+
+
+        //监听操作按钮
+        table.on('tool(test)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'look') {
+                window.location.href="/toScore/"+data.id;
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

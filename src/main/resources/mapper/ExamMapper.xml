@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zhx.onlineexam.mapper.ExamMapper">
+
+
+
+    <resultMap id="examMap" type="exam">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="begintime" property="begintime"/>
+        <result column="endtime" property="endtime"/>
+        <result column="lasttime" property="lasttime"/>
+        <result column="choicenum" property="choicenum"/>
+        <result column="choicesnum" property="choicesnum"/>
+        <result column="tofnum" property="tofnum"/>
+        <result column="subjectivenum" property="subjectivenum"/>
+        <result column="fillnum" property="fillnum"/>
+        <result column="choicescore" property="choicescore"/>
+        <result column="choicesscore" property="choicesscore"/>
+        <result column="tofscrore" property="tofscrore"/>
+        <result column="subjectscore" property="subjectscore"/>
+        <result column="fillscore" property="fillscore"/>
+        <result column="total" property="total"/>
+        <result column="courseid" property="courseid"/>
+        <result column="classids" property="classids"/>
+        <result column="teacherid" property="teacherid"/>
+        <result column="difficultid" property="difficultid"/>
+        <association property="difficult" javaType="difficult">
+            <result column="did" property="id"/>
+            <result column="dname" property="name"/>
+        </association>
+        <association property="course" javaType="Course">
+            <result column="cid" property="id"/>
+            <result column="cname" property="name"/>
+        </association>
+        <association property="user" javaType="user">
+            <result column="uid" property="id"/>
+            <result column="uname" property="name"/>
+        </association>
+    </resultMap>
+
+
+
+
+    <resultMap id="hisExamMap" type="StudentExam">
+        <result column="id" property="id"/>
+        <result column="begintime" property="begintime"/>
+        <result column="endtime" property="endtime"/>
+        <result column="score" property="score"/>
+        <result column="examid" property="examid"/>
+        <result column="userid" property="userid"/>
+        <result column="editsubject" property="editsubject"/>
+        <association property="exam" javaType="exam">
+            <result column="eid" property="id"/>
+            <result column="ename" property="name"/>
+        </association>
+        <association property="user" javaType="user">
+            <result column="uid" property="id"/>
+            <result column="uname" property="name"/>
+        </association>
+    </resultMap>
+
+    <!--显示所有试卷-->
+    <select id="listExams" resultMap="examMap" parameterType="cn.zhx.onlineexam.entity.Criteria">
+        <if test="name!=null and name!=''">
+            <bind name="name1" value="'%'+name+'%'"/>
+        </if>
+        <if test="classid!=0">
+            <bind name="classid1" value="'%'+classid+'%'"/>
+        </if>
+        SELECT
+        e.id,e.`name`,e.begintime,e.endtime,e.lasttime,e.courseid,e.classids,e.choicenum,
+        e.choicesnum,e.tofnum,e.subjectivenum,e.fillnum,e.choicescore,e.choicesscore,
+        e.tofscore,e.subjectscore,e.fillscore,e.total,e.difficultid,
+        e.teacherid,u.id uid,u.`name` uname,c.id cid,c.`name` cname,d.id did,d.`name` dname
+        FROM
+        exam AS e LEFT JOIN course AS c on e.courseid=c.id
+        LEFT JOIN `user` AS u on e.teacherid=u.id
+        LEFT JOIN `difficult` AS d on e.difficultid=d.id
+        <where>
+            <if test="difficultid!=0">
+                and e.difficultid =#{difficultid}
+            </if>
+            <if test="courseid!=0">
+                and e.courseid =#{courseid}
+            </if>
+            <if test="classid!=0">
+                and e.classids like #{classid1}
+            </if>
+            <if test="userid!=0">
+                and u.id = #{userid}
+            </if>
+            <if test="name!=null and name!=''">
+                and e.`name` like #{name1}
+            </if>
+        </where>
+    </select>
+    <insert id="addExam" parameterType="exam">
+        INSERT into exam(name,begintime,endtime,lasttime,courseid,classids,
+            choicenum,choicesnum,tofnum,subjectivenum,fillnum,
+            choicescore,choicesscore,tofscore,subjectscore,fillscore,
+            total,teacherid,difficultid) values(#{name},#{begintime},#{endtime},#{lasttime},#{courseid},#{classids},
+            #{choicenum},#{choicesnum},#{tofnum},#{subjectivenum},#{fillnum},
+            #{choicescore},#{choicesscore},#{tofscore},#{subjectscore},#{fillscore},
+            #{total},#{teacherid},#{difficultid})
+    </insert>
+<!--    修改题目-->
+    <update id="editExam" parameterType="exam">
+        update  exam
+        <set>
+            <!--set会自动删除最后的逗号-->
+            <if test="name!=null">name=#{name},</if>
+            <if test="begintime!=null">begintime=#{begintime},</if>
+            <if test="endtime!=null">endtime=#{endtime},</if>
+            <if test="lasttime!=null">lasttime=#{lasttime},</if>
+            <if test="choicenum!=null">choicenum=#{choicenum},</if>
+            <if test="choicesnum!=null">choicesnum=#{choicesnum},</if>
+            <if test="tofnum!=null">tofnum=#{tofnum},</if>
+            <if test="subjectivenum!=null">subjectivenum=#{subjectivenum},</if>
+            <if test="fillnum!=null">fillnum=#{fillnum},</if>
+            <if test="choicescore!=null">choicescore=#{choicescore},</if>
+            <if test="choicesscore!=null">choicesscore=#{choicesscore},</if>
+            <if test="tofscore!=null">tofscore=#{tofscore},</if>
+            <if test="subjectscore!=null">subjectscore=#{subjectscore},</if>
+            <if test="fillscore!=null">fillscore=#{fillscore},</if>
+            <if test="total!=null">total=#{total},</if>
+            <if test="courseid!=null">courseid=#{courseid},</if>
+            <if test="teacherid!=null">teacherid=#{teacherid},</if>
+            <if test="classids!=null">classids=#{classids},</if>
+            <if test="difficultid!=null">difficultid=#{difficultid},</if>
+        </set>
+        where id=#{id}
+    </update>
+<!--历史试卷-->
+    <select id="listHisExams" resultMap="hisExamMap" parameterType="cn.zhx.onlineexam.entity.Criteria">
+        <if test="name!=null and name!=''">
+            <bind name="name1" value="'%'+name+'%'"/>
+        </if>
+        <if test="classid!=0">
+            <bind name="classid1" value="'%'+classid+'%'"/>
+        </if>
+            SELECT e.`name` ename,s.id,s.examid,s.begintime,s.endtime,s.score,s.userid,s.editsubject, u.`name` uname
+            FROM `student-exam` AS s LEFT JOIN
+            exam AS e on s.examid=e.id LEFT JOIN `user` AS u ON s.userid=u.id
+
+        <where>
+            <if test="difficultid!=0">
+                and e.difficultid =#{difficultid}
+            </if>
+            <if test="courseid!=0">
+                and e.courseid =#{courseid}
+            </if>
+            <if test="userid!=0">
+                and s.userid = #{userid}
+            </if>
+            <if test="classid!=0">
+                and e.classids like #{classid1}
+            </if>
+            <if test="name!=null and name!=''">
+                and e.`name` like #{name1}
+            </if>
+        </where>
+    </select>
+
+<!--    学生查看自己的历史试卷-->
+    <select id="findHisExamsByClassId" resultMap="hisExamMap" parameterType="user">
+        SELECT s.id,s.examid ,s.userid,e.`name` ename,e.total,s.begintime,s.endtime,s.score,s.editsubject
+        FROM `student-exam` s LEFT JOIN exam e on s.examid=e.id
+        where userid=#{id}
+    </select>
+
+</mapper>

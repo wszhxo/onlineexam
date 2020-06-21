@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>登陆</title>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all"/>
+    <link rel="stylesheet" th:href="@{/css/login.css}" media="all"/>
+</head>
+<body>
+
+
+<div style="padding: 20px ;">
+    <div class="layui-row layui-col-space15">
+        <form class="layui-form"  method="post">
+            <div class="layui-col-sm12 layui-col-md12">
+                <div class='layui-form-item'>
+                    <label class='layui-form-label'>题目</label>
+                    <div class='layui-input-block'>
+                        <input th:value="${questionById!=null}?${questionById.id}"  type='hidden' name="id"  >
+                        <input th:value="${questionById!=null}?${questionById.title}"  type='text' name="title" lay-verify='required' autocomplete='off' class='layui-input' >
+                    </div>
+                </div>
+                <div class='layui-form-item'>
+                    <label class='layui-form-label' >A选项</label>
+                    <div class='layui-input-block'>
+                        <input th:value="${questionById!=null}?${questionById.optA}" type='text' name='optA'  autocomplete='off' placeholder='不超过30个字' class='layui-input' >
+                    </div>
+                </div>
+
+                <div class='layui-form-item'>
+                    <label class='layui-form-label' >B选项</label>
+                    <div class='layui-input-block'>
+                        <input th:value="${questionById!=null}?${questionById.optB}" type='text' name='optB'  autocomplete='off' placeholder='不超过30个字' class='layui-input' i>
+                    </div>
+                </div>
+                <div class='layui-form-item'>
+                    <label class='layui-form-label'>C选项</label>
+                    <div class='layui-input-block'>
+                        <input th:value="${questionById!=null}?${questionById.optC}" type='text' name='optC'  autocomplete='off' placeholder='不超过30个字' class='layui-input' >
+                    </div>
+                </div>
+
+                <div class='layui-form-item'>
+                    <label class='layui-form-label' >D选项</label>
+                    <div class='layui-input-block'>
+                        <input th:value="${questionById!=null}?${questionById.optD}" type='text' name='optD'  autocomplete='off' placeholder='不超过30个字' class='layui-input'>
+                    </div>
+                </div>
+
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label">答案</label>
+                    <div class="layui-input-block">
+                        <textarea  th:utext="${questionById!=null}?${questionById.answer}" lay-verify='required' placeholder="多选题用英文逗号分隔" class="layui-textarea" name="answer"></textarea>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">类型</label>
+                        <div class="layui-input-inline">
+                            <select name="categoryid" id="categoryid" lay-verify="required">
+                                <option value="">请选择类型</option>
+                                <option th:each="cate :${listCategory}" th:value="${cate.id}" th:text="${cate.name}" th:selected="${questionById!=null}?${cate.id==questionById.categoryid}" ></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">难度</label>
+                        <div class="layui-input-inline">
+                            <select name="difficultid" id="difficultid" lay-verify="required">
+                                <option value="">请选择难度</option>
+                                <option th:each="cate :${listDifficult}" th:value="${cate.id}" th:text="${cate.name}" th:selected="${questionById!=null}?${cate.id==questionById.difficultid}" ></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">课程</label>
+                        <div class="layui-input-inline">
+                            <select name="courseid" id="courseid" lay-verify="required">
+                                <option value="">请选择课程</option>
+                                <option th:each="cate :${listCourse}" th:value="${cate.id}" th:text="${cate.name}" th:selected="${questionById!=null}?${cate.id==questionById.courseid}" ></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class='layui-btn layui-btn-normal' lay-submit="" th:if="${questionById==null}" lay-filter="addQuestion">保存 </button>
+                    <button class='layui-btn layui-btn-normal' lay-submit="" th:if="${questionById!=null}" lay-filter="addQuestion">修改 </button>
+                    <button type="reset" class='layui-btn layui-btn-primary'>重置</button>
+                    <a class='layui-btn layui-btn-primary'   onclick="back();">返回</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- Jquery Js -->
+<script type="text/javascript" th:src="@{/js/jquery-1.11.3.min.js}"></script>
+<!-- Layui Js -->
+<script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+</body>
+<script>
+    function back(){
+        window.location.href="/question";//刷新父页面
+    }
+    layui.use([ 'form'], function(){
+        var $=layui.$
+            ,form = layui.form;
+
+
+        form.on('submit(addQuestion)',function (data) {
+            $.post('/questions',{id:data.field.id,title:data.field.title,optA:data.field.optA,optB:data.field.optB,optC:data.field.optC,optD:data.field.optD,answer:data.field.answer,courseid:data.field.courseid,categoryid:data.field.categoryid,difficultid:data.field.difficultid},function (result) {
+                if (result.code == 1){
+                    layer.alert(result.msg, {
+                        icon: 1,
+                        skin: 'layer-ext-moon'
+                    },function(){
+                         window.location.href="/question";
+                    })
+                } else if (result == 0) {
+                    layer.alert('添加出错,请稍后！',{
+                        title: '错误信息'
+                    })
+                }
+            },'json');
+            return false;
+        });
+
+
+
+
+        // 获取难度的下拉框
+        $.ajax({
+            url:  "/difficults",
+            dataType: 'json',
+            type: 'get',
+            success: function (data) {
+                $.each(data.data, function (index, item) {
+                    $("select[name=difficultid]").append('<option value="'+item.id+'">'+item.name+'</option>');
+                });
+                layui.form.render("select");
+            }
+        });
+        //获取题目种类的下拉框
+        $.ajax({
+            url:  "/categorys",
+            dataType: 'json',
+            type: 'get',
+            success: function (data) {
+                $.each(data.data, function (index, item) {
+                    $("select[name=categoryid]").append('<option value="'+item.id+'">'+item.name+'</option>');
+                });
+                layui.form.render("select");
+            }
+        });
+        //获取课程的下拉框
+        $.ajax({
+            url:  "/courses",
+            dataType: 'json',
+            type: 'get',
+            success: function (data) {
+                $.each(data.data, function (index, item) {
+                    $("select[name=courseid]").append('<option value="'+item.id+'">'+item.name+'</option>');
+                });
+                layui.form.render("select");
+            }
+        });
+
+
+    });
+
+</script>
+</html>

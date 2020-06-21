@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>试题管理</title>
+    <script th:src="@{/layui/layui.js}"></script>
+    <script th:src="@{/js/jquery.js}"></script>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+    <style type="text/css">
+        html,body{
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+
+</head>
+<body>
+<div class="layui-form layui-card-header layuiadmin-card-header-auto">
+        <div class="layui-inline">
+            <label class="layui-form-label">限制班级</label>
+            <div class="layui-input-inline">
+                <select name="classid" id="classid" lay-filter="cls">
+                    <option value="0">默认全专业</option>
+                </select>
+            </div>
+        </div>
+</div>
+
+
+<div style="text-align: center;">
+    <div class="layui-inline">
+        <table  class="layui-hide" id="test" lay-filter="test"></table>
+    </div>
+</div>
+
+
+
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <p class="layui-btn layui-btn-fluid layui-btn-normal" lay-event="getCheckLength">成绩排行榜</p>
+    </div>
+</script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+
+
+
+
+
+
+<script  th:inline="javascript">
+    layui.use(['form', 'table'],function () {
+        var table = layui.table;
+        var form = layui.form;
+        var $ = layui.$;
+
+        //获取题目种类的下拉框
+        $.ajax({
+            url:  "/classs",
+            dataType: 'json',
+            type: 'get',
+            success: function (data) {
+                $.each(data.data, function (index, item) {
+                    $("select[name=classid]").append('<option value="'+item.id+'">'+item.name+'</option>');
+                });
+                layui.form.render("select");
+            }
+        });
+
+        /*<![CDATA[*/
+        table.render({
+            elem: '#test'
+            ,url:'/score/'+[[${examid}]]
+            ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            ,title: '成绩表'
+            ,cols: [[
+                 {type:'numbers', title:'排名',width:200},
+                {field:'name', title:'姓名', width:200}
+                ,{field:'userid', title:'学号', width:200}
+                ,{field:'score', title:'分数', width:200,sort: true}
+                ,{field:'lasttime', title:'用时(时/分/秒)', width:200, sort: true}
+                //,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:150}//不知道为什么这行不能删除
+            ]]
+
+            ,id: 'testReload'
+        });
+        /*]]>*/
+
+        form.on('select(cls)', function(data){
+            var classid = $('#classid');
+            //执行重载
+            table.reload('testReload', {
+                method: 'get'
+                ,page: {
+                    curr: 1 //重新从第 1 页开始
+                },
+                where: {
+                    classid: classid.val()
+                }
+            });
+        });
+
+
+
+
+
+
+    });
+</script>
+
+</body>
+</html>

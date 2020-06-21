@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>班级管理</title>
+    <script th:src="@{/layui/layui.js}"></script>
+    <script th:src="@{/js/jquery.js}"></script>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+    <style type="text/css">
+        html,body{
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <div style="padding-bottom: 10px;">
+<!--                -->
+                <a  style="margin-left: 70px"  class="layui-btn layui-btn-normal" onclick="add();">添加班级</a>
+            </div>
+            <table class="layui-hide" id="test" lay-filter="test"></table>
+
+            <script type="text/html" id="barDemo">
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+            </script>
+        </div>
+    </div>
+</div>
+
+
+<script  th:inline="none">
+    function add(){//添加学生
+        layer.prompt({
+            formType: 2
+            ,title: '添加班级班级'
+            ,value: ''
+        }, function(value, index){
+            if(value.replace(/(^\s*)|(\s*$)/g, "")==''){
+                layer.msg('不能为空!');
+                return false;
+            }else{
+                layer.close(index);
+                //这里一般是发送修改的Ajax请求
+                $.post('/class', {name:value}, function (result) {
+                    if (result.code>0) {
+                        layer.msg('添加成功');
+                        window.location.reload();//刷新父页面
+                    }
+                }, 'json');
+                //同步更新表格和缓存对应的值
+                obj.update({
+                    sign: value
+                });
+            }
+
+        });
+    }
+    layui.use(['form', 'table'],function () {
+        var table = layui.table;
+        var form = layui.form;
+        var $ = layui.$;
+
+        table.render({
+            elem: '#test'
+            , url: '/class'
+            , title: '班级'
+            , cols: [[
+                {field: 'id', title: '序号', width: 100}
+                , {field: 'name', title: '班级名', width: 200,event: 'setSign'}
+                , {field: 'courseidnames', title: '关联课程', width: 600}
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo',width: 200}
+            ]]
+            ,page: true
+        });
+
+
+        table.on('tool(test)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'setSign'){
+                layer.prompt({
+                    formType: 2
+                    ,title: '修改 ID 为 ['+ data.id +'] 的班级'
+                    ,value: data.name
+                }, function(value, index){
+                    layer.close(index);
+                    //这里一般是发送修改的Ajax请求
+                    $.post('/class', {id:data.id,name:value}, function (result) {
+                        if (result.code>0) {
+                            layer.msg('修改成功');
+                            window.location.reload();//刷新父页面
+                        }
+                    }, 'json');
+                    //同步更新表格和缓存对应的值
+                    obj.update({
+                        sign: value
+                    });
+                });
+            }else if (obj.event === 'del') {
+                layer.confirm('您确定要删除该班级信息吗？', function (index) {
+                    $.ajax({
+                        url:'/class/'+data.id,
+                        type:"DELETE",
+                        dataType:"json",
+                        success:function(result){
+                            if (result.code > 0) {
+                                layer.msg("删除成功!")
+                                window.location.reload();//刷新父页面
+                            }else{
+                                layer.msg("系统异常!重新删除!")
+                            }
+                        }
+                    });
+                });
+            }else if (obj.event === 'add') {
+
+            }
+        });
+
+    });
+</script>
+</body>
+</html>

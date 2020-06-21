@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zhx.onlineexam.mapper.QuestionMapper">
+    <resultMap id="questionMap" type="Question">
+        <result column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="optA" property="optA"/>
+        <result column="optB" property="optB"/>
+        <result column="optC" property="optC"/>
+        <result column="optD" property="optD"/>
+        <result column="answer" property="answer"/>
+        <result column="categoryid" property="categoryid"/>
+        <result column="difficultid" property="difficultid"/>
+        <result column="courseid" property="courseid"/>
+        <association property="category" javaType="category">
+            <result column="cid" property="id"/>
+            <result column="cname" property="name"/>
+        </association>
+        <association property="difficult" javaType="difficult">
+            <result column="did" property="id"/>
+            <result column="dname" property="name"/>
+        </association>
+        <association property="course" javaType="course">
+            <result column="sid" property="id"/>
+            <result column="sname" property="name"/>
+        </association>
+    </resultMap>
+
+
+    <resultMap id="examquestionMap" type="ExamQuestion">
+        <result column="id" property="id"/>
+        <result column="examid" property="examid"/>
+        <result column="questionid" property="questionid"/>
+        <result column="userid" property="userid"/>
+        <result column="istrue" property="istrue"/>
+        <result column="score" property="score"/>
+        <result column="eanswer" property="answer"/>
+        <result column="sort" property="sort"/>
+        <association property="question" javaType="question">
+            <result column="id" property="id"/>
+            <result column="title" property="title"/>
+            <result column="optA" property="optA"/>
+            <result column="optB" property="optB"/>
+            <result column="optC" property="optC"/>
+            <result column="optD" property="optD"/>
+            <result column="answer" property="answer"/>
+            <result column="categoryid" property="categoryid"/>
+            <result column="difficultid" property="difficultid"/>
+            <result column="courseid" property="courseid"/>
+        </association>
+    </resultMap>
+
+    <!--显示所有问题-->
+    <select id="listQuestion" resultMap="questionMap" parameterType="cn.zhx.onlineexam.entity.Criteria">
+        <if test="title!=null and title!=''">
+            <bind name="title1" value="'%'+title+'%'"/>
+        </if>
+        SELECT
+        q.id, q.title, q.optA,q.optB,q.optC,q.optD,q.answer,q.categoryid,q.difficultid,q.courseid,
+        c.id cid,c.`name` cname,
+        s.id sid,s.`name` sname,
+        d.id did,d.`name` dname
+        FROM
+        question AS q
+        LEFT JOIN
+        difficult AS d on q.difficultid=d.id
+        LEFT JOIN
+        course AS s on q.courseid=s.id
+        LEFT JOIN
+        category AS c on q.categoryid=c.id
+        <where>
+            <if test="difficultid!=0">
+                and q.difficultid =#{difficultid}
+            </if>
+            <if test="courseid!=0">
+                and q.courseid =#{courseid}
+            </if>
+            <if test="categoryid!=0">
+                and q.categoryid =#{categoryid}
+            </if>
+            <if test="title!=null and title!=''">
+                and q.title like #{title1}
+            </if>
+        </where>
+    </select>
+
+
+
+    <!--学生查看历史试卷-->
+    <select id="findHisExamQuestions" resultMap="examquestionMap" >
+        SELECT	q.id, q.title,	q.optA,	q.optB,	q.optC,	q.optD,	e.questionid,	q.answer,	e.istrue,	e.score, e.userid,	e.answer eanswer
+        FROM `exam-question` AS e LEFT JOIN
+        question AS q ON e.questionid=q.id
+        where e.examid=#{examid} AND e.userid=#{userid} and q.categoryid=#{categoryid}
+        ORDER BY e.sort
+    </select>
+<!--    修改题目-->
+    <update id="editQuestion" parameterType="question">
+        update  question
+        <set>
+            <!--set会自动删除最后的逗号-->
+            <if test="title!=null">title=#{title},</if>
+            <if test="optA!=null">optA=#{optA},</if>
+            <if test="optB!=null">optB=#{optB},</if>
+            <if test="optC!=null">optC=#{optC},</if>
+            <if test="optD!=null">optD=#{optD},</if>
+            <if test="answer!=null">answer=#{answer},</if>
+            <if test="categoryid!=null">categoryid=#{categoryid},</if>
+            <if test="difficultid!=null">difficultid=#{difficultid},</if>
+            <if test="courseid!=null">courseid=#{courseid},</if>
+        </set>
+        where id=#{id}
+    </update>
+
+
+
+
+</mapper>

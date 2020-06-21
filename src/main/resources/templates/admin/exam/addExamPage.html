@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>登陆</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all"/>
+    <link rel="stylesheet" th:href="@{/css/login.css}" media="all"/>
+    <link rel="stylesheet" th:href="@{/css/formSelects-v4.css}" media="all"/>
+</head>
+<body>
+
+
+<div style="padding: 20px ;">
+    <div class="layui-row layui-col-space15">
+        <form class="layui-form"  method="post">
+
+            <div class="layui-col-sm12 layui-col-md12">
+                <div class='layui-form-item'>
+                    <label class='layui-form-label'>试卷标题</label>
+                    <div class='layui-input-block'>
+                        <input th:value="${examById!=null}?${examById.id}"  type='hidden' name="id"  >
+                        <input th:value="${examById!=null}?${examById.name}"  type='text' name="name" lay-verify='required|title' autocomplete='off' class='layui-input' >
+                    </div>
+                </div>
+                <div class='layui-form-item'>
+                    <label class='layui-form-label' >开始日期</label>
+                    <div class='layui-input-inline'>
+                        <input th:value="${examById!=null}?${examById.begintime}" type='text'   id="begintime"  name='begintime'  autocomplete='off' placeholder='YY-MM-DD HH:mm:ss' class='layui-input' >
+                    </div>
+                    <label class='layui-form-label' >结束日期</label>
+                    <div class='layui-input-inline'>
+                        <input th:value="${examById!=null}?${examById.endtime}" type='text' id="endtime"  name='endtime'  autocomplete='off' placeholder='YY-MM-DD HH:mm:ss' class='layui-input' >
+                    </div>
+                    <label class='layui-form-label' >考试时长</label>
+                    <div class='layui-input-inline'>
+                        <input th:value="${examById!=null}?${examById.lasttime}" type='text' id="lasttime"  name='lasttime'  autocomplete='off' placeholder='HH:mm:ss' class='layui-input' >
+                    </div>
+                </div>
+
+                <div class='layui-form-item'>
+                    <label class='layui-form-label' >所属课程</label>
+                    <div class='layui-input-inline'>
+                        <select name="courseid" id="courseid" lay-verify="required">
+                            <option value="">请选择课程</option>
+                            <option th:each="cate :${listCourse}" th:value="${cate.id}" th:text="${cate.name}" th:selected="${examById!=null}?${cate.id==examById.courseid}" ></option>
+                        </select>
+                    </div>
+                    <label class='layui-form-label' >难易程度</label>
+                    <div class='layui-input-inline'>
+                        <select name="difficultid" id="difficultid" lay-verify="required">
+                            <option value="">请选择难度</option>
+                            <option th:each="cate :${listDifficult}" th:value="${cate.id}" th:text="${cate.name}" th:selected="${examById!=null}?${cate.id==examById.difficultid}" ></option>
+                        </select>
+                    </div>
+                    <label class='layui-form-label' >考试班级</label>
+                    <div class='layui-input-inline'>
+                        <select name="classids"  xm-select="select8" xm-select-search="/classSelect" lay-verify='required' >
+                            <option value="">请选择班级</option>
+                            <option th:each="cate :${classSelects}" th:value="${cate.value}" th:text="${cate.name}" th:selected="${examById!=null}?${cate.selected}" ></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">数量</label>
+                    <div class="layui-inline">
+                        <div class="layui-input-inline">
+                            <input th:value="${examById!=null}?${examById.choicenum}" type='text'   name='choicenum'  autocomplete='off' placeholder='单选题数量' class='layui-input' lay-verify="required|num">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <div class="layui-input-inline">
+                            <input th:value="${examById!=null}?${examById.choicesnum}" type='text'   name='choicesnum'  autocomplete='off' placeholder='多选题数量' class='layui-input' lay-verify="required|num">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <div class="layui-input-inline">
+                            <input th:value="${examById!=null}?${examById.tofnum}" type='text'   name='tofnum'  autocomplete='off' placeholder='判断题数量' class='layui-input' lay-verify="required|num">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <div class="layui-input-inline">
+                            <input th:value="${examById!=null}?${examById.fillnum}" type='text'   name='fillnum'  autocomplete='off' placeholder='填空题数量' class='layui-input' lay-verify="required|num">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <div class="layui-input-inline">
+                            <input th:value="${examById!=null}?${examById.subjectivenum}" type='text'   name='subjectivenum'  autocomplete='off' placeholder='主观题数量' class='layui-input' lay-verify="required|num">
+                        </div>
+                    </div>
+                </div>
+
+        <!--  分数设置start-->
+                <div class="layui-form-item">
+                    <label class="layui-form-label">分数</label>
+                    <div class="layui-inline">
+                        <div class="layui-input-inline">
+                            <input th:value="${examById!=null}?${examById.choicescore}" type='text'   name='choicescore'  autocomplete='off' placeholder='单选题分数' class='layui-input' lay-verify="required|num">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <div class="layui-input-inline">
+                            <input th:value="${examById!=null}?${examById.choicesscore}" type='text'   name='choicesscore'  autocomplete='off' placeholder='多选题分数' class='layui-input' lay-verify="required|num">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <div class="layui-input-inline">
+                            <input th:value="${examById!=null}?${examById.tofscore}" type='text'   name='tofscore'  autocomplete='off' placeholder='判断题分数' class='layui-input' lay-verify="required|num">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <div class="layui-input-inline">
+                            <input th:value="${examById!=null}?${examById.fillscore}" type='text'   name='fillscore'  autocomplete='off' placeholder='填空题分数' class='layui-input' lay-verify="required|num">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <div class="layui-input-inline">
+                            <input th:value="${examById!=null}?${examById.subjectscore}" type='text'   name='subjectscore'  autocomplete='off' placeholder='主观题分数' class='layui-input' lay-verify="required|num">
+                        </div>
+                    </div>
+                </div>
+                <!-- 分数设置end-->
+
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class='layui-btn layui-btn-normal' lay-submit="" th:if="${examById==null}" lay-filter="addexam">保存 </button>
+                    <button class='layui-btn layui-btn-normal' lay-submit=""  th:if="${type==1}" lay-filter="addexam">修改 </button>
+                    <button type="reset" class='layui-btn layui-btn-primary'>重置</button>
+                    <a class='layui-btn layui-btn-primary'   onclick="back();">返回</a>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+<!-- Jquery Js -->
+<script type="text/javascript" th:src="@{/js/jquery-1.11.3.min.js}"></script>
+<!-- Layui Js -->
+<script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+<!--多选框-->
+<script type="text/javascript" th:src="@{/js/formSelects-v4.min.js}"></script>
+
+</body>
+
+
+<script>
+
+
+    //全局定义一次, 加载formSelects
+    layui.config({
+        base: '/layui/' //此处路径请自行处理, 可以使用绝对路径
+    }).extend({
+        formSelects: 'formSelects'
+    });
+    function back(){
+        window.location.href="/exam";//刷新父页面
+    }
+    layui.use(['jquery', 'formSelects','form','laydate'], function(){
+        var $=layui.$
+        ,form = layui.form
+        ,laydate = layui.laydate;
+
+        var formSelects = layui.formSelects;
+
+        //自定义验证规则
+        form.verify({
+            title: function(value){
+                if(value.length > 20 && value.length < 0){
+                    return '试卷名过长20个字符以内';
+                }
+            }
+            ,num: [/\d+\.?\d{0,2}/,'账号请输入数字']
+            ,content: function(value){
+                layedit.sync(editIndex);
+            }
+        });
+
+        var start = laydate.render({
+            elem: '#begintime', //
+            type: 'datetime',
+            done: function (value, date) {
+                endMax = end.config.max;
+                end.config.min = date;
+                end.config.min.month = date.month - 1;
+            },
+            change: function (value, date, endDate) {
+                var timestamp2 = Date.parse(new Date(value));
+                timestamp2 = timestamp2 / 1000;
+                end.config.min = timestamp2;
+                end.config.min.month = date.month - 1;
+            }
+        });
+
+        var end = laydate.render({
+            elem: '#endtime',
+            type: 'datetime',
+            done: function (value, date) {
+                if ($.trim(value) == '') {
+                    var curDate = new Date();
+                    date = { 'date': curDate.getDate(), 'month': curDate.getMonth() + 1, 'year': curDate.getFullYear() };
+                }
+                start.config.max = date;
+                start.config.max.month = date.month - 1;
+            }
+        });
+
+        var last = laydate.render({
+            elem: '#lasttime',
+            type: 'time',
+            done: function (value, date) {
+                endMax = last.config.max;
+                endMin=  last.config.min;
+            }
+        });
+
+        form.on('submit(addexam)',function (data) {
+            $.post('/exams',data.field,function (result) {
+                if (result.code == 1){
+                    layer.alert(result.msg, {
+                        icon: 1,
+                        skin: 'layer-ext-moon'
+                    },function(){
+                        window.location.href="/exam";
+                    })
+                } else if (result == 0) {
+                    layer.alert('添加出错,请稍后！',{
+                        title: '错误信息'
+                    })
+                }
+            },'json');
+            return false;
+        });
+
+
+        // 获取难度的下拉框
+        $.ajax({
+            url:  "/difficults",
+            dataType: 'json',
+            type: 'get',
+            success: function (data) {
+                $.each(data.data, function (index, item) {
+                    $("select[name=difficultid]").append('<option value="'+item.id+'">'+item.name+'</option>');
+                });
+                layui.form.render("select");
+            }
+        });
+        //获取课程的下拉框
+        $.ajax({
+            url:  "/courses",
+            dataType: 'json',
+            type: 'get',
+            success: function (data) {
+                $.each(data.data, function (index, item) {
+                    $("select[name=courseid]").append('<option value="'+item.id+'">'+item.name+'</option>');
+                });
+                layui.form.render("select");
+            }
+        });
+    });
+</script>
+
+</html>

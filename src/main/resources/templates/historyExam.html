@@ -1,0 +1,397 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="content-type" c] ontent="text/html;charset=UTF-8">
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title>在线考试</title>
+	<link th:href="@{/css/main.css}" rel="stylesheet" type="text/css" />
+	<link th:href="@{/css/iconfont.css}" rel="stylesheet" type="text/css" />
+	<link th:href="@{/css/test.css}" rel="stylesheet" type="text/css" />
+	<link th:href="@{/css/jquery.dialogbox-1.0.css}" rel="stylesheet" type="text/css" />
+
+	<style>
+		.hasBeenAnswer {
+			background: #5d9cec;
+			color: #fff;
+		}
+		.judge{
+			width: 64px;
+			height: 64px;
+			right: 68px;
+			position: absolute;
+			z-index: 99;
+		}
+
+	</style>
+</head>
+
+<body>
+<div class="main">
+	<div class="test_main">
+		<div class="nr_left">
+			<div class="test">
+					<!--单选题start-->
+					<div th:if="${questionsChoice !=null }">
+						<div class="test_content">
+							<div class="test_content_title">
+								<h2>单选题</h2>
+								<p>
+									<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsChoice)}" >20</i><span>题，</span><span>合计</span><i class="content_fs"  th:text="${#arrays.length(questionsChoice)}*${examsByid.choicescore}">333</i><span>分</span>
+								</p>
+							</div>
+						</div>
+						<div class="test_content_nr">
+							<ul>
+								<li  th:each="choice : ${questionsChoice}">
+									<div class="test_content_nr_tt"  th:id="'questionsChoice'+${choiceStat.index+1}" >
+										<i th:text="${choiceStat.index+1}">1</i>(<span th:text="${examsByid.choicescore}">2</span>分)<span th:text="${choice.question.title}">题目</span>
+										<div th:if="${choice.answer==choice.question.answer}" th:style="'background-image: url('+@{/images/right.png}+')'" class="judge"></div>
+										<div th:if="${choice.answer!=choice.question.answer}" th:style="'background-image: url('+@{/images/wrong.png}+')'" class="judge"></div>
+									</div>
+									<div class="test_content_nr_main">
+										<ul>
+											<li class="option">
+												<label >
+													A.<p class="ue" style="display: inline;" th:text="${choice.question.optA}">4444</p>
+												</label>
+											</li>
+											<li class="option">
+												<label >
+													B.<p class="ue" style="display: inline;" th:text="${choice.question.optB}">4444</p>
+												</label>
+											</li>
+											<li class="option">
+												<label >
+													C.<p class="ue" style="display: inline;" th:text="${choice.question.optC}">4444</p>
+												</label>
+											</li>
+											<li class="option">
+												<label >
+													D.<p class="ue" style="display: inline;" th:text="${choice.question.optD}">4444</p>
+												</label>
+											</li>
+											<li class="option">
+												<label style="color: #0C0C0C;margin-top: 10px">
+													正确答案 <p style="display: inline;" th:text="${choice.question.answer}">4444</p>
+													你的回答 <p th:style="'display: inline;color:' + @{(${choice.answer==choice.question.answer} ? 'green' : 'red')} "   style="display: inline;" th:text="${choice.answer}">4444</p>
+													得分 <p style="display: inline;" th:text="${choice.score}">4444</p>
+												</label>
+											</li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<!--单选题end-->
+					<!--多选题start-->
+					<div th:if="${questionsChoices !=null }">
+						<div class="test_content">
+							<div class="test_content_title">
+								<h2>多选题</h2>
+								<p>
+									<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsChoices)}" >20</i><span>题，</span><span>合计</span><i class="content_fs"  th:text="${#arrays.length(questionsChoices)}*${examsByid.choicesscore}">333</i><span>分</span>
+								</p>
+							</div>
+						</div>
+						<div class="test_content_nr">
+							<ul>
+								<li  th:each="choices : ${questionsChoices}">
+									<div class="test_content_nr_tt" th:id="'questionsChoices'+${choicesStat.index+1}" >
+										<i th:text="${choicesStat.index+1}">1</i>(<span th:text="${examsByid.choicesscore}">2</span>分)<span th:text="${choices.question.title}">题目</span>
+										<div th:if="${choices.answer==choices.question.answer}" th:style="'background-image: url('+@{/images/right.png}+')'" class="judge"></div>
+										<div th:if="${choices.answer!=choices.question.answer}" th:style="'background-image: url('+@{/images/wrong.png}+')'" class="judge"></div>
+									</div>
+									<div class="test_content_nr_main">
+										<ul>
+											<li class="option">
+												<label >
+													A.<p class="ue" style="display: inline;" th:text="${choices.question.optA}">4444</p>
+												</label>
+											</li>
+											<li class="option">
+												<label >
+													B.<p class="ue" style="display: inline;" th:text="${choices.question.optB}">4444</p>
+												</label>
+											</li>
+											<li class="option">
+												<label >
+													C.<p class="ue" style="display: inline;" th:text="${choices.question.optC}">4444</p>
+												</label>
+											</li>
+											<li class="option">
+												<label >
+													D.<p class="ue" style="display: inline;" th:text="${choices.question.optD}">4444</p>
+												</label>
+											</li>
+											<li class="option">
+												<label style="color: #0C0C0C;margin-top: 10px">
+													正确答案 <p style="display: inline;" th:text="${choices.question.answer}">4444</p>
+													你的回答 <p th:style="'display: inline;color:' + @{(${choices.answer==choices.question.answer} ? 'green' : 'red')} "   style="display: inline;" th:text="${choices.answer}">4444</p>
+													得分 <p style="display: inline;" th:text="${choices.score}">4444</p>
+												</label>
+											</li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<!--多选end-->
+					<!--判断题start-->
+					<div th:if="${questionsTof !=null }">
+						<div class="test_content">
+							<div class="test_content_title">
+								<h2>判断题</h2>
+								<p>
+									<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsTof)}" >20</i><span>题，</span><span>合计</span><i class="content_fs"  th:text="${#arrays.length(questionsTof)}*${examsByid.choicescore}">333</i><span>分</span>
+								</p>
+							</div>
+						</div>
+						<div class="test_content_nr">
+							<ul>
+								<li  th:each="tof : ${questionsTof}">
+									<div class="test_content_nr_tt" th:id="'questionsTof'+${tofStat.index+1}">
+										<i th:text="${tofStat.index+1}">1</i>(<span th:text="${examsByid.tofscore}">2</span>分)<span  th:text="${tof.question.title}">题目</span>
+										<div th:if="${tof.answer==tof.question.answer}" th:style="'background-image: url('+@{/images/right.png}+')'" class="judge"></div>
+										<div th:if="${tof.answer!=tof.question.answer}" th:style="'background-image: url('+@{/images/wrong.png}+')'" class="judge"></div>
+									</div>
+
+									<div class="test_content_nr_main">
+										<ul>
+											<li class="option">
+												<label style="color: #0C0C0C;margin-top: 10px">
+													正确答案 <p style="display: inline;" th:text="${tof.question.answer}">4444</p>
+													你的回答 <p th:style="'display: inline;color:' + @{(${tof.answer==tof.question.answer} ? 'green' : 'red')} "   style="display: inline;" th:text="${tof.answer}">4444</p>
+													得分 <p style="display: inline;" th:text="${tof.score}">4444</p>
+												</label>
+											</li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<!--判断题end-->
+					<!--填空题start-->
+					<div th:if="${questionsFill !=null }">
+						<div class="test_content">
+							<div class="test_content_title">
+								<h2>填空题</h2>
+								<p>
+									<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsFill)}" >20</i><span>题，</span><span>合计</span><i class="content_fs"  th:text="${#arrays.length(questionsFill)}*${examsByid.fillscore}">333</i><span>分</span>
+								</p>
+							</div>
+						</div>
+						<div class="test_content_nr">
+							<ul>
+								<li  th:each="fill : ${questionsFill}">
+									<div class="test_content_nr_tt" th:id="'questionsFill'+${fillStat.index+1}">
+										<i th:text="${fillStat.index+1}">1</i>(<span th:text="${examsByid.fillscore}">2</span>分)<span  th:text="${fill.question.title}">题目</span>
+										<div th:if="${fill.answer==fill.question.answer}" th:style="'background-image: url('+@{/images/right.png}+')'" class="judge"></div>
+										<div th:if="${fill.answer!=fill.question.answer}" th:style="'background-image: url('+@{/images/wrong.png}+')'" class="judge"></div>
+									</div>
+									<div class="test_content_nr_main">
+											<table  lay-size="lg" style="font-size:17px;">
+												<colgroup>
+													<col width="200">
+													<col>
+												</colgroup>
+												<thead>
+												<tr>
+													<th colspan="2" style="border-top:0px; " th:text="${fill.score}">本题得分：2分</th>
+												</tr>
+												</thead>
+												<tbody>
+												<tr>
+													<td>正确答案：</td>
+													<td th:text="${fill.question.answer}"></td>
+												</tr>
+												<tr>
+													<td>您的答案：</td>
+													<td th:text="${fill.answer}"></td>
+												</tr>
+												</tbody>
+											</table>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<!--填空题end-->
+					<!--主观题start-->
+					<div th:if="${questionsSubjective !=null }">
+						<div class="test_content">
+							<div class="test_content_title">
+								<h2>主观题</h2>
+								<p>
+									<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsSubjective)}" >20</i><span>题，</span><span>合计</span><i class="content_fs"  th:text="${#arrays.length(questionsSubjective)}*${examsByid.subjectscore}">333</i><span>分</span>
+								</p>
+							</div>
+						</div>
+						<div class="test_content_nr">
+							<ul>
+
+								<li  th:each="subject : ${questionsSubjective}">
+									<div class="test_content_nr_tt" th:id="'questionsSubjective'+${subjectStat.index+1}" >
+										<i th:text="${subjectStat.index+1}">1</i>(<span th:text="${examsByid.subjectscore}">2</span>分)<span th:text="${subject.question.title}">题目</span>
+										<form  th:if="${session.user.type !=111}" th:id="'subject'+${subjectStat.index+1}">
+											<input type="hidden" name="examid" th:value="${examsByid.id}" style="display: none"/>
+											<input type="hidden" name="questionid"  th:value="${subject.id}" style="display: none"/>
+											<input type="hidden" name="userid"  th:value="${subject.userid}" style="display: none"/>
+											<input type="hidden" name="answer"  th:value="${subject.answer}" style="display: none"/>
+											<input type="hidden" name="total"  th:value="${oldScore}" style="display: none"/>
+											<input type="hidden" name="oldScore"  th:value="${subject.score}" style="display: none"/>
+											<input type="text" name="score" style="width:100px; height:30px;" placeholder="请输入评分" th:value="${subject.score}"/>
+											<button th:onclick="'addSubjectScore('+${subjectStat.index+1}+')'" style="width:100px; height:30px;">评分</button>
+										</form>
+									</div>
+									<div class="test_content_nr_main">
+											<table  lay-size="lg" style="font-size:17px;">
+												<colgroup>
+													<col width="200">
+													<col>
+												</colgroup>
+												<thead>
+												<tr>
+													<th colspan="2" style="border-top:0px; " th:text="${subject.score}">本题得分：2分</th>
+												</tr>
+												</thead>
+												<tbody>
+												<tr>
+													<td>正确答案：</td>
+													<td th:text="${subject.question.answer}"></td>
+												</tr>
+												<tr>
+													<td>您的答案：</td>
+													<td th:text="${subject.answer}"></td>
+												</tr>
+												</tbody>
+											</table>
+									</div>
+								</li>
+
+							</ul>
+						</div>
+					</div>
+					<!--主观题end-->
+			</div>
+		</div>
+		<div class="nr_right">
+			<div class="nr_rt_main">
+				<div class="rt_nr1" id="rt_nr1">
+					<div class="rt_nr1_title">
+						<h1>
+							答题卡
+						</h1>
+						<a th:if="${session.user.type ==111}" th:href="@{/student}"><h1>返回主页</h1></a>
+					</div>
+
+					<!--单选题start-->
+					<div class="rt_content" th:if=" ${questionsChoice!=null}">
+						<div class="rt_content_tt">
+							<h2>单选题</h2>
+							<p>
+								<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsChoice)}">80</i><span>题</span>
+							</p>
+						</div>
+						<div class="rt_content_nr answerSheet">
+							<ul>
+								<span   th:each="choice : ${questionsChoice}">
+									<li><a th:style="'color:#fff;background-color:' + @{(${choice.answer==choice.question.answer} ? '#389fc3' : '#ff000087')} "  th:href="@{'#questionsChoice'+${choiceStat.index+1}}" th:text="${choiceStat.index+1}">题目序号</a></li>
+								</span>
+							</ul>
+						</div>
+					</div>
+					<!--单选题end-->
+					<!--多选题start-->
+					<div class="rt_content" th:if=" ${questionsChoices!=null}">
+						<div class="rt_content_tt">
+							<h2>多选题</h2>
+							<p>
+								<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsChoices)}">80</i><span>题</span>
+							</p>
+						</div>
+						<div class="rt_content_nr answerSheet">
+							<ul>
+										<span   th:each="choices : ${questionsChoices}">
+											<li><a th:style="'color:#fff;background-color:' + @{(${choices.answer==choices.question.answer} ? '#389fc3' : '#ff000087')} "  th:href="@{'#questionsChoices'+${choicesStat.index+1}}" th:text="${choicesStat.index+1}">题目序号</a></li>
+										</span>
+							</ul>
+						</div>
+					</div>
+					<!--多选题end-->
+					<!--判断题start-->
+					<div class="rt_content" th:if=" ${questionsTof!=null}">
+						<div class="rt_content_tt">
+							<h2>判断题</h2>
+							<p>
+								<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsTof)}">80</i><span>题</span>
+							</p>
+						</div>
+						<div class="rt_content_nr answerSheet">
+							<ul>
+										<span   th:each="tof : ${questionsTof}">
+											<li><a th:style="'color:#fff;background-color:' + @{(${tof.answer==tof.question.answer} ? '#389fc3' : '#ff000087')} "  th:href="@{'#questionsTof'+${tofStat.index+1}}" th:text="${tofStat.index+1}">题目序号</a></li>
+										</span>
+							</ul>
+						</div>
+					</div>
+					<!--判断题end-->
+					<!--填空题start-->
+					<div class="rt_content" th:if=" ${questionsFill!=null}">
+						<div class="rt_content_tt">
+							<h2>填空题</h2>
+							<p>
+								<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsFill)}">80</i><span>题</span>
+							</p>
+						</div>
+						<div class="rt_content_nr answerSheet">
+							<ul>
+										<span   th:each="fill : ${questionsFill}">
+											<li><a th:style="'color:#fff;background-color:' + @{(${fill.answer==fill.question.answer} ? '#389fc3' : '#ff000087')} " th:href="@{'#questionsFill'+${fillStat.index+1}}" th:text="${fillStat.index+1}">题目序号</a></li>
+										</span>
+							</ul>
+						</div>
+					</div>
+					<!--填空题end-->
+					<!--主观题start-->
+					<div class="rt_content" th:if=" ${questionsSubjective!=null}">
+						<div class="rt_content_tt">
+							<h2>主观题</h2>
+							<p>
+								<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsSubjective)}">80</i><span>题</span>
+							</p>
+						</div>
+						<div class="rt_content_nr answerSheet">
+							<ul>
+										<span   th:each="subject : ${questionsSubjective}">
+											<li><a th:href="@{'#questionsSubjective'+${subjectStat.index+1}}" th:text="${subjectStat.index+1}">题目序号</a></li>
+										</span>
+							</ul>
+						</div>
+					</div>
+					<!--主观题end-->
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+<script th:src="@{/js/jquery-1.11.3.min.js}"></script>
+<!--	弹出层插件-->
+<script th:src="@{/js/jquery.dialogbox-1.0.js}"></script>
+<script th:inline="javascript">
+
+	function addSubjectScore(sort){
+		$.post('/addSubjectScore',$("#subject"+sort).serialize(),function (result) {
+
+		},'json');
+
+	}
+
+</script>
+</html>

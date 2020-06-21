@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>在线考试系统</title>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}"  media="all">
+    <script th:src="@{/layui/layui.js}" charset="utf-8"></script>
+    <script th:src="@{/js/jquery.js}"></script>
+</head>
+<body>
+<div class="layui-row">
+    <div class="layui-col-xs4 layui-col-md2">
+        <div class="grid-demo">
+            <div class="layui-card" >
+                <div class="layui-card-header" style="font-size: 28px;">在线考试</div>
+                <div class="layui-card-body">
+                    <p>您好！<span style="font-size: 1.5em;font-weight: bold" id="navname" th:text="${session.user.name}"></span>，欢迎来到在线答题</p>
+                    <p>加油！</p>
+                </div>
+                <div class="layui-card-body">
+                    <p><a onclick="logout()" class="layui-btn layui-btn-xs ">退出登录</a> </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-col-xs14 layui-col-md10">
+        <div class="grid-demo grid-demo-bg1">
+            <div class="layui-tab layui-tab-card">
+                <ul class="layui-tab-title">
+                    <li class="layui-this">试卷</li>
+                    <li>答题历史</li>
+                    <li>过期试卷</li>
+                </ul>
+                <div class="layui-tab-content" style="min-height: 490px;">
+                    <div class="layui-tab-item layui-show">
+                        <div style="clear:both;">
+                            <table class="layui-hide" id="test" lay-filter="test"></table>
+                        </div>
+                    </div>
+                    <div class="layui-tab-item">
+                        <div style="clear:both;">
+                            <table class="layui-hide" id="test2" lay-filter="test2"></table>
+                        </div>
+                    </div>
+                    <div class="layui-tab-item">
+                        <div style="clear:both;">
+                            <table class="layui-hide" id="test3" lay-filter="test3"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-xs " lay-event="exam">开始做题</a>
+    </script>
+    <script type="text/html" id="barDemo2">
+        <a class="layui-btn layui-btn-xs " lay-event="look">查看情况</a>
+        <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+    </script>
+</div>
+<script type="text/javascript" th:inline="none">
+// 退出登录
+    function  logout(){
+        layer.confirm('您确定要退出系统吗？', function () {
+            $.get("/logout",function (result) {
+                if (result.code>0){
+                    window.location.href = "/toLogin";
+                }
+            },'json')
+        })
+    }
+    layui.use(['element','table'], function(){
+        var $ = layui.jquery
+            ,element = layui.element; //Tab的切换功能，切换事件监听等，需要依赖element模块
+        var table = layui.table;
+
+        table.render({
+            elem: '#test'
+            , url: '/exams'
+            , title: '试卷表'
+            , cols: [[  {field: 'id', title: '序号', width: 100}
+                , {field: 'name', title: '试卷名', width: 200}
+                , {field: 'begintime', title: '开始时间', width: 200}
+                , {field: 'endtime', title: '结束时间', width: 200}
+                , {field: 'lasttime', title: '考试时长', width: 200}
+                , {field: 'total', title: '总分', width: 200}
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo'}
+            ]]
+            ,text:{none: '暂时没有考试,或者已过期!'}
+            ,page: true
+        });
+        //监听行工具事件/点击开始考试
+        table.on('tool(test)', function (obj) {
+            var data = obj.data;
+            if(obj.event === 'exam'){
+                layer.confirm('<div style="padding: 10px; line-height: 22px;  font-weight: 300;">' +
+                    '答题开始即开始计时，中途不可暂停，如超时则自动提交<br>' +
+                    '1、考试过程中无法暂停，请提前安排好时间；如未及时交卷，则本次考试作废<br>' +
+                    '2、推荐使用 Chrome 浏览器（版本：73及以上的正式版本），或Firefox浏览器（版本：66及以上的正式版本)</div>',{
+                    area: ['500px', '300px'],
+                    btn: ['开始考试', '拒绝']
+                }, function () {
+                    window.location.href='/beginExam/'+data.id
+                });
+
+            }
+        });
+
+        table.render({
+            elem: '#test2'
+            , url: '/hisExam'
+            , title: '历史试卷表'
+            , cols: [[  {field: 'id', title: '序号', width: 100}
+                , {field: 'name', title: '试卷名', width: 200,templet: function(d){
+                        return d.exam.name;
+                    }}
+                , {field: 'begintime', title: '开始时间', width: 200}
+                , {field: 'endtime', title: '结束时间', width: 200}
+                , {field: 'score', title: '分数', width: 200}
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo2', width: 200}
+            ]]
+            ,page: true
+        });
+        table.render({
+            elem: '#test3'
+            , url: '/expireExam'
+            , title: '历史试卷表'
+            , cols: [[  {field: 'id', title: '序号', width: 100}
+                , {field: 'name', title: '试卷名', width: 200}
+                , {field: 'begintime', title: '开始时间', width: 200}
+                , {field: 'endtime', title: '结束时间', width: 200}
+                // , {fixed: 'right', title: '操作', toolbar: '#barDemo3', width: 200}
+            ]]
+            ,page: true
+        });
+
+
+        //监听行工具事件
+        table.on('tool(test2)', function (obj) {
+            var data = obj.data;
+            if(obj.event === 'look'){
+                window.location.href='historyExam/'+data.userid+'/'+data.examid+'/'+data.score
+            }else if (obj.event === 'del'){
+                layer.confirm('您确定要删除该历史试卷吗？', function (index) {
+                    $.ajax({
+                        url:'/historyExam/'+data.userid+'/'+data.examid,
+                        type:"DELETE",
+                        dataType:"json",
+                        success:function(result){
+                            if (result.code > 0) {
+                                layer.msg("删除成功!")
+                                window.location.reload();//刷新页面
+                            }else{
+                                layer.msg("系统异常!重新删除!")
+                            }
+                        }
+                    });
+                })
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,436 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" c] ontent="text/html;charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>在线考试</title>
+<link th:href="@{/css/main.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/css/iconfont.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/css/test.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/css/jquery.dialogbox-1.0.css}" rel="stylesheet" type="text/css" />
+	<script th:src="@{/js/jquery-1.11.3.min.js}"></script>
+<style>
+.hasBeenAnswer {
+	background: #5d9cec;
+	color:#fff;
+}
+
+</style>
+</head>
+
+<body>
+	<div class="main">
+		<div class="test_main">
+			<div class="nr_left">
+				<div class="test">
+					<form method="post">
+						<input type="hidden" id ="nowtime" name="begintime" >
+						<input type="hidden" id ="endtime" name="endtime" >
+						<div class="test_title">
+							<span><a onclick="submit()" style="border: none;padding: 0 18px;height: 40px;line-height: 40px;font-size:20px; font-weight: bolder;
+    															background: #389fc3; color: #fff;border-radius: 5px;margin-bottom: 10px;">交卷</a></span>
+						</div>
+
+						<!--单选题start-->
+						<div th:if="${questionsChoice !=null }">
+							<div class="test_content">
+								<div class="test_content_title">
+									<h2>单选题</h2>
+									<p>
+										<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsChoice)}" >20</i><span>题，</span><span>合计</span><i class="content_fs"  th:text="${#arrays.length(questionsChoice)}*${examsByid.choicescore}">333</i><span>分</span>
+									</p>
+								</div>
+							</div>
+							<div class="test_content_nr">
+								<ul>
+									<li  th:each="choice : ${questionsChoice}">
+										<div class="test_content_nr_tt"  th:id="'questionsChoice'+${choiceStat.index+1}">
+											<i th:text="${choiceStat.index+1}">1</i>(<span th:text="${examsByid.choicescore}">2</span>分)<span th:text="${choice.title}">题目</span>
+										</div>
+										<div class="test_content_nr_main">
+											<ul>
+												<li class="option">
+													<label ><input th:attr="name='questionsChoice'+${choiceStat.index+1}" type="radio" class="radioOrCheck"   value="A"/>
+													A.<p class="ue" style="display: inline;" th:text="${choice.optA}">4444</p>
+													</label>
+												</li>
+												<li class="option">
+													<label ><input th:attr="name='questionsChoice'+${choiceStat.index+1}" type="radio" class="radioOrCheck"   value="B"/>
+													B.<p class="ue" style="display: inline;" th:text="${choice.optB}">4444</p>
+													</label>
+												</li>
+												<li class="option">
+													<label ><input th:attr="name='questionsChoice'+${choiceStat.index+1}" type="radio" class="radioOrCheck"   value="C"/>
+													C.<p class="ue" style="display: inline;" th:text="${choice.optC}">4444</p>
+													</label>
+												</li>
+												<li class="option">
+													<label ><input th:attr="name='questionsChoice'+${choiceStat.index+1} " type="radio" class="radioOrCheck"   value="D"/>
+													D.<p class="ue" style="display: inline;" th:text="${choice.optD}">4444</p>
+													</label>
+												</li>
+											</ul>
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<!--单选题end-->
+						<!--多选题start-->
+						<div th:if="${questionsChoices !=null }">
+							<div class="test_content">
+								<div class="test_content_title">
+									<h2>多选题</h2>
+									<p>
+										<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsChoices)}" >20</i><span>题，</span><span>合计</span><i class="content_fs"  th:text="${#arrays.length(questionsChoices)}*${examsByid.choicesscore}">333</i><span>分</span>
+									</p>
+								</div>
+							</div>
+							<div class="test_content_nr">
+								<ul>
+									<li  th:each="choices : ${questionsChoices}">
+										<div class="test_content_nr_tt" th:id="'questionsChoices'+${choicesStat.index+1}" >
+											<i th:text="${choicesStat.index+1}">1</i>(<span th:text="${examsByid.choicesscore}">2</span>分)<span th:text="${choices.title}">题目</span>
+										</div>
+										<div class="test_content_nr_main">
+											<ul>
+												<li class="option">
+													<label ><input th:attr="name='questionsChoices'+${choicesStat.index+1}" type="checkbox" class="radioOrCheck"   value="A"/>
+													A.<p class="ue" style="display: inline;" th:text="${choices.optA}">4444</p>
+													</label>
+												</li>
+												<li class="option">
+													<label ><input th:attr="name='questionsChoices'+${choicesStat.index+1}" type="checkbox" class="radioOrCheck"   value="B"/>
+													B.<p class="ue" style="display: inline;" th:text="${choices.optB}">4444</p>
+													</label>
+												</li>
+												<li class="option">
+													<label ><input th:attr="name='questionsChoices'+${choicesStat.index+1}" type="checkbox" class="radioOrCheck"   value="C"/>
+													C.<p class="ue" style="display: inline;" th:text="${choices.optC}">4444</p>
+													</label>
+												</li>
+												<li class="option">
+													<label ><input th:attr="name='questionsChoices'+${choicesStat.index+1}" type="checkbox" class="radioOrCheck"   value="D"/>
+													D.<p class="ue" style="display: inline;" th:text="${choices.optD}">4444</p>
+													</label>
+												</li>
+											</ul>
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<!--多选end-->
+						<!--判断题start-->
+						<div th:if="${questionsTof !=null }">
+							<div class="test_content">
+								<div class="test_content_title">
+									<h2>判断题</h2>
+									<p>
+										<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsTof)}" >20</i><span>题，</span><span>合计</span><i class="content_fs"  th:text="${#arrays.length(questionsTof)}*${examsByid.choicescore}">333</i><span>分</span>
+									</p>
+								</div>
+							</div>
+							<div class="test_content_nr">
+								<ul>
+									<li  th:each="tof : ${questionsTof}">
+										<div class="test_content_nr_tt" th:id="'questionsTof'+${tofStat.index+1}">
+											<i th:text="${tofStat.index+1}">1</i>(<span th:text="${examsByid.tofscore}">2</span>分)<span  th:text="${tof.title}">题目</span>
+										</div>
+										<div class="test_content_nr_main">
+											<ul>
+												<li class="option">
+													<label ><input th:attr="name='questionsTof'+${tofStat.index+1}" type="radio" class="radioOrCheck"   value="对"/>
+													<p class="ue" style="display: inline;" >对</p>
+													</label>
+												</li>
+												<li class="option">
+													<label ><input th:attr="name='questionsTof'+${tofStat.index+1}" type="radio" class="radioOrCheck"   value="错"/>
+													<p class="ue" style="display: inline;">错</p>
+													</label>
+												</li>
+											</ul>
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<!--判断题end-->
+						<!--填空题start-->
+						<div th:if="${questionsFill !=null }">
+							<div class="test_content">
+								<div class="test_content_title">
+									<h2>填空题</h2>
+									<p>
+										<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsFill)}" >20</i><span>题，</span><span>合计</span><i class="content_fs"  th:text="${#arrays.length(questionsFill)}*${examsByid.fillscore}">333</i><span>分</span>
+									</p>
+								</div>
+							</div>
+							<div class="test_content_nr">
+								<ul>
+									<li  th:each="fill : ${questionsFill}">
+										<div class="test_content_nr_tt" th:id="'questionsFill'+${fillStat.index+1}">
+											<i th:text="${fillStat.index+1}">1</i>(<span th:text="${examsByid.fillscore}">2</span>分)<span  th:text="${fill.title}">题目</span>
+										</div>
+										<div class="test_content_nr_main">
+											<label>
+												<input th:attr="name='questionsFill'+${fillStat.index+1}" type="text" class="radioOrCheck"  value="" onblur="addcls(this);"  style="width:100px; height:30px;"/>
+											</label>
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<!--填空题end-->
+						<!--主观题start-->
+						<div th:if="${questionsSubjective !=null }">
+							<div class="test_content">
+								<div class="test_content_title">
+									<h2>主观题</h2>
+									<p>
+										<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsSubjective)}" >20</i><span>题，</span><span>合计</span><i class="content_fs"  th:text="${#arrays.length(questionsSubjective)}*${examsByid.subjectscore}">333</i><span>分</span>
+									</p>
+								</div>
+							</div>
+							<div class="test_content_nr">
+								<ul>
+									<li  th:each="subject : ${questionsSubjective}">
+										<div class="test_content_nr_tt" th:id="'questionsSubjective'+${subjectStat.index+1}" >
+											<i th:text="${subjectStat.index+1}">1</i>(<span th:text="${examsByid.subjectscore}">2</span>分)<span th:text="${subject.title}">题目</span>
+										</div>
+										<div class="test_content_nr_main">
+											<label><textarea th:attr="name='questionsSubjective'+${subjectStat.index+1}"  class="radioOrCheck"  onBlur="addcls(this);" style="margin: 0px; width: 803px; height: 89px;"></textarea></label>
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+
+						<!--主观题end-->
+					</form>
+				</div>
+			</div>
+			<div class="nr_right">
+				<div class="nr_rt_main">
+					<div class="rt_nr1" id="rt_nr1">
+						<div class="rt_nr1_title">
+							<h1>
+								答题卡
+							</h1>
+							<p class="test_time">
+								<b class="alt-1" th:text="${examsByid.lasttime}">00:70</b>
+							</p>
+						</div>
+							<!--单选题start-->
+							<div class="rt_content" th:if=" ${questionsChoice!=null}">
+								<div class="rt_content_tt">
+									<h2>单选题</h2>
+									<p>
+										<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsChoice)}">80</i><span>题</span>
+									</p>
+								</div>
+								<div class="rt_content_nr answerSheet">
+									<ul>
+											<span   th:each="choice : ${questionsChoice}">
+											<li><a th:href="@{'#questionsChoice'+${choiceStat.index+1}}" th:text="${choiceStat.index+1}">题目序号</a></li>
+										</span>
+									</ul>
+								</div>
+							</div>
+						<!--单选题end-->
+							<!--多选题start-->
+							<div class="rt_content" th:if=" ${questionsChoices!=null}">
+								<div class="rt_content_tt">
+									<h2>多选题</h2>
+									<p>
+										<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsChoices)}">80</i><span>题</span>
+									</p>
+								</div>
+								<div class="rt_content_nr answerSheet">
+									<ul>
+										<span   th:each="choices : ${questionsChoices}">
+											<li><a th:href="@{'#questionsChoices'+${choicesStat.index+1}}" th:text="${choicesStat.index+1}">题目序号</a></li>
+										</span>
+									</ul>
+								</div>
+							</div>
+						<!--多选题end-->
+							<!--判断题start-->
+							<div class="rt_content" th:if=" ${questionsTof!=null}">
+								<div class="rt_content_tt">
+									<h2>判断题</h2>
+									<p>
+										<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsTof)}">80</i><span>题</span>
+									</p>
+								</div>
+								<div class="rt_content_nr answerSheet">
+									<ul>
+										<span   th:each="tof : ${questionsTof}">
+											<li><a th:href="@{'#questionsTof'+${tofStat.index+1}}" th:text="${tofStat.index+1}">题目序号</a></li>
+										</span>
+									</ul>
+								</div>
+							</div>
+						<!--判断题end-->
+							<!--填空题start-->
+							<div class="rt_content" th:if=" ${questionsFill!=null}">
+								<div class="rt_content_tt">
+									<h2>填空题</h2>
+									<p>
+										<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsFill)}">80</i><span>题</span>
+									</p>
+								</div>
+								<div class="rt_content_nr answerSheet">
+									<ul>
+										<span   th:each="fill : ${questionsFill}">
+											<li><a th:href="@{'#questionsFill'+${fillStat.index+1}}" th:text="${fillStat.index+1}">题目序号</a></li>
+										</span>
+									</ul>
+								</div>
+							</div>
+						<!--填空题end-->
+							<!--主观题start-->
+							<div class="rt_content" th:if=" ${questionsSubjective!=null}">
+								<div class="rt_content_tt">
+									<h2>主观题</h2>
+									<p>
+										<span>共</span><i class="content_lit" th:text="${#arrays.length(questionsSubjective)}">80</i><span>题</span>
+									</p>
+								</div>
+								<div class="rt_content_nr answerSheet">
+									<ul>
+										<span   th:each="subject : ${questionsSubjective}">
+											<li><a th:href="@{'#questionsSubjective'+${subjectStat.index+1}}" th:text="${subjectStat.index+1}">题目序号</a></li>
+										</span>
+									</ul>
+								</div>
+							</div>
+						<!--主观题end-->
+					</div>
+
+				</div>
+			</div>
+		</div>
+		<!--nr end-->
+		<div class="foot"><span id="time"></span></div>
+	</div>
+
+
+	<script th:src="@{/js/jquery.easy-pie-chart.js}"></script>
+	<!--时间js-->
+	<script th:src="@{/js/jquery.countdown.js}"></script>
+<!--	弹出层插件-->
+	<script th:src="@{/js/jquery.dialogbox-1.0.js}"></script>
+	<script th:inline="javascript">
+		//判断是否在前面加0
+		function getNow(s) {
+			return s < 10 ? '0' + s: s;
+		}
+
+		function nowTime(){
+			var myDate = new Date;
+			var year = myDate.getFullYear(); //获取当前年
+			var mon = myDate.getMonth() + 1; //获取当前月
+			var date = myDate.getDate(); //获取当前日
+			var h = myDate.getHours();//获取当前小时数(0-23)
+			var m = myDate.getMinutes();//获取当前分钟数(0-59)
+			var s = myDate.getSeconds();//获取当前秒
+			return getNow(year) + "-" + getNow(mon) + "-" + getNow(date) + " " + getNow(h) + ":"+ getNow(m) + ":" +getNow(s) ;
+		}
+		$(function() {
+			//var now=nowTime();//获取当前时间
+			$('#nowtime').val(nowTime());
+			$('li.option label').click(function() {
+				//当前标签label-> 子标签 input -> name属性
+				var questionId = $(this).children().attr('name'); // 得到题目name
+				var cardLi = $('a[href=#' + questionId + ']'); // 根据题目ID找到对应答题卡
+				if(!cardLi.hasClass('hasBeenAnswer')){
+					// 设置已答题
+					cardLi.addClass('hasBeenAnswer');
+				}
+			});
+
+			//表示时间到了,自动提交
+			$('.alt-1').countDown().on('time.elapsed',function() {
+				$('#endtime').val(nowTime());
+
+				/*<![CDATA[*/
+				$.ajax({
+					url:  "/endExam/"+[[${examsByid.id}]],
+					dataType: 'json',
+					data: $("form").serialize(),
+					type: 'post',
+					success: function (data) {
+						$('body').dialogbox({type:"warning",title:"倒计时警告",message:"你的客观题得分为: "+data.data+" 分。查看历史试卷了解具体情况!"});
+						//添加student-exam表信息
+						window.location.href="/student"
+					}
+				});
+				/*]]>*/
+			});
+		});
+
+		//最后5分钟提示
+		setInterval("timeout()","1000");
+		function timeout(){
+			var t=$('.alt-1 time ').attr('datetime').substring(5,10);
+			if(t=="04M59"){
+				$('body').dialogbox({type:"warning",title:"倒计时警告",message:"还有最后五分钟,抓紧时间!"});
+				return false;
+			}
+		}
+
+
+		//input,textarea失去焦点事件
+		function addcls( c){
+			var questionvalue = $(c).val(); // 获取填空的值
+			var questionname = $(c).attr('name'); // 获取填获取name
+			var cardLi = $('a[href=#' + questionname + ']'); // 根据题目name找到对应答题卡
+			if (questionvalue.trim().length>0) {
+				// 设置已答题
+				cardLi.addClass('hasBeenAnswer');
+			}else {
+				cardLi.removeClass('hasBeenAnswer');
+			}
+		}
+		function submit(){
+			$('#endtime').val(nowTime());
+			console.log($('#nowtime').val())
+			console.log($('#endtime').val())
+			var i=0;
+			$('#rt_nr1 a').each(function(){
+				if(!$(this).hasClass('hasBeenAnswer')){//循环答题卡的所有a标签,判断是否已经作答
+					i++;
+				}
+			});
+			if (i>0){
+				$('body').dialogbox({type:"warning",title:"警告",message:"您还有"+i+"道题目没做!"});
+			} else {
+				//表示所有题目做完可以提交了
+				/*<![CDATA[*/
+				$.ajax({
+					url:  "/endExam/"+[[${examsByid.id}]],
+					dataType: 'json',
+					data: $("form").serialize(),
+					type: 'post',
+					success: function (data) {
+						$('body').dialogbox({type:"warning",title:"倒计时警告",message:"你的客观题得分为: "+data.data+" 分。查看历史试卷了解具体情况!"});
+						//添加student-exam表信息
+						window.location.href="/student"
+					}
+				});
+				/*]]>*/
+			}
+
+		}
+		//获取地址栏属性
+		function getUrlParam(name) {
+			var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+			var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+			if (r!=null) return unescape(r[2]); return null; //返回参数值
+		}
+	</script>
+</body>
+
+</html>
